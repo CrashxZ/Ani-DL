@@ -25,6 +25,8 @@ jobs:
           dotnet restore AniDL.slnx
           dotnet build AniDL.slnx -c Release --no-restore
           dotnet test tests/Jellyfin.Plugin.AniDL.Tests/Jellyfin.Plugin.AniDL.Tests.csproj -c Release --no-build
+          node --input-type=module --check < src/Jellyfin.Plugin.AniDL/Web/anidl.js
+          node --input-type=module --check < src/Jellyfin.Plugin.AniDL/Web/config.js
 
       - name: Publish and package
         env:
@@ -49,7 +51,7 @@ jobs:
         run: |
           gh release create "$TAG" "artifacts/anidl-${TAG}.zip" \
             --title "AniDL ${TAG#v}" \
-            --notes "Initial experimental AniSuge adapter with authenticated Jellyfin UI and persistent download queue."
+            --notes "Fixes Jellyfin 10.11 JSON field handling and displays actionable HTTP errors in the AniDL UI."
 
       - name: Update Jellyfin repository manifest
         env:

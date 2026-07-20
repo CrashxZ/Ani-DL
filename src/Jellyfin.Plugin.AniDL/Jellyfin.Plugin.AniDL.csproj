@@ -3,7 +3,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>Jellyfin.Plugin.AniDL</RootNamespace>
     <AssemblyName>Jellyfin.Plugin.AniDL</AssemblyName>
-    <Version>0.1.0.1</Version>
+    <Version>0.1.0.2</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <Description>Secure, adapter-based anime download manager for Jellyfin.</Description>

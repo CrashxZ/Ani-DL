@@ -22,11 +22,15 @@ jobs:
         run: dotnet build AniDL.slnx -c Release --no-restore
       - name: Test
         run: dotnet test tests/Jellyfin.Plugin.AniDL.Tests/Jellyfin.Plugin.AniDL.Tests.csproj -c Release --no-build
+      - name: Validate web scripts
+        run: |
+          node --input-type=module --check < src/Jellyfin.Plugin.AniDL/Web/anidl.js
+          node --input-type=module --check < src/Jellyfin.Plugin.AniDL/Web/config.js
       - name: Publish plugin
         run: dotnet publish src/Jellyfin.Plugin.AniDL/Jellyfin.Plugin.AniDL.csproj -c Release --no-build -o artifacts/AniDL
       - name: Package plugin
-        run: cd artifacts && zip -r AniDL-0.1.0.1.zip AniDL
+        run: cd artifacts && zip -r AniDL-0.1.0.2.zip AniDL
       - uses: actions/upload-artifact@v4
         with:
-          name: AniDL-0.1.0.1
-          path: artifacts/AniDL-0.1.0.1.zip
+          name: AniDL-0.1.0.2
+          path: artifacts/AniDL-0.1.0.2.zip
