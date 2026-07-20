@@ -6,7 +6,15 @@
     "overview": "Search, queue, and import authorized anime downloads.",
     "owner": "CrashxZ",
     "category": "General",
-    "versions": []
+    "versions": [
+      {
+        "version": "0.1.0.0",
+        "changelog": "Initial experimental AniSuge adapter, secure download queue, and Jellyfin UI.",
+        "targetAbi": "10.11.11.0",
+        "sourceUrl": "https://github.com/CrashxZ/Ani-DL/releases/download/v0.1.0.0/anidl-v0.1.0.0.zip",
+        "checksum": "384f88e347d9a033d9d6bd206d5b8acd",
+        "timestamp": "2026-07-20T09:08:19Z"
+      }
+    ]
   }
 ]
-
