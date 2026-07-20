@@ -8,6 +8,14 @@
     "category": "General",
     "versions": [
       {
+        "version": "0.1.0.3",
+        "changelog": "v0.1.0.3 - Fixed download request validation compatibility with Jellyfin 10.11.",
+        "targetAbi": "10.11.6.0",
+        "sourceUrl": "https://github.com/CrashxZ/Ani-DL/releases/download/v0.1.0.3/anidl-v0.1.0.3.zip",
+        "checksum": "d98ef56c8d48929aa15ad8bd1556d560",
+        "timestamp": "2026-07-20T10:01:06Z"
+      },
+      {
         "version": "0.1.0.2",
         "changelog": "v0.1.0.2 - Fixed Jellyfin JSON field handling and actionable UI request errors.",
         "targetAbi": "10.11.6.0",
