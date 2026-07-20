@@ -146,7 +146,7 @@ public sealed partial class AniSugeSource(IHttpClientFactory httpClientFactory, 
         throw new NotSupportedException("None of the available providers exposed a direct HLS, DASH, or MP4 resource.", lastError);
     }
 
-    private IReadOnlyList<AnimeCard> ParseCards(string html)
+    private AnimeCard[] ParseCards(string html)
     {
         var document = _parser.ParseDocument(html);
         return document.QuerySelectorAll(".anime.main-card .item")
@@ -358,7 +358,7 @@ public sealed partial class AniSugeSource(IHttpClientFactory httpClientFactory, 
 
     private static string NormalizeSeriesUrl(string value) => EpisodeSuffixRegex().Replace(value, string.Empty);
 
-    private Uri GetBaseUri()
+    private static Uri GetBaseUri()
     {
         var configured = Plugin.Instance?.Configuration.AniSugeBaseUrl ?? "https://anisuge.tv";
         var uri = new Uri(configured.TrimEnd('/') + "/");
