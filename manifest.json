@@ -1,0 +1,12 @@
+[
+  {
+    "guid": "6c408441-bce2-4f41-a7d7-b2786f759342",
+    "name": "AniDL",
+    "description": "Adapter-based anime search and authorized download manager for Jellyfin.",
+    "overview": "Search, queue, and import authorized anime downloads.",
+    "owner": "CrashxZ",
+    "category": "General",
+    "versions": []
+  }
+]
+

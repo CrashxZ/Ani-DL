@@ -1,0 +1,94 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore, build, and test
+        run: |
+          dotnet restore AniDL.slnx
+          dotnet build AniDL.slnx -c Release --no-restore
+          dotnet test tests/Jellyfin.Plugin.AniDL.Tests/Jellyfin.Plugin.AniDL.Tests.csproj -c Release --no-build
+
+      - name: Publish and package
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          dotnet publish src/Jellyfin.Plugin.AniDL/Jellyfin.Plugin.AniDL.csproj -c Release --no-build -o artifacts/AniDL
+          cd artifacts/AniDL
+          zip -r "../anidl-${TAG}.zip" .
+
+      - name: Calculate package checksum
+        id: package
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          echo "checksum=$(md5sum artifacts/anidl-${TAG}.zip | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG" "artifacts/anidl-${TAG}.zip" \
+            --title "AniDL ${TAG#v}" \
+            --notes "Initial experimental AniSuge adapter with authenticated Jellyfin UI and persistent download queue."
+
+      - name: Update Jellyfin repository manifest
+        env:
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ steps.package.outputs.version }}
+          CHECKSUM: ${{ steps.package.outputs.checksum }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import datetime
+          import json
+          import os
+
+          path = "manifest.json"
+          with open(path, encoding="utf-8") as stream:
+              manifest = json.load(stream)
+
+          entry = {
+              "version": os.environ["VERSION"],
+              "changelog": "Initial experimental AniSuge adapter, secure download queue, and Jellyfin UI.",
+              "targetAbi": "10.11.11.0",
+              "sourceUrl": f"https://github.com/{os.environ['REPOSITORY']}/releases/download/{os.environ['TAG']}/anidl-{os.environ['TAG']}.zip",
+              "checksum": os.environ["CHECKSUM"],
+              "timestamp": datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+          }
+          versions = [item for item in manifest[0]["versions"] if item["version"] != entry["version"]]
+          manifest[0]["versions"] = [entry, *versions]
+
+          with open(path, "w", encoding="utf-8") as stream:
+              json.dump(manifest, stream, indent=2)
+              stream.write("\n")
+          PY
+
+      - name: Commit manifest
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git commit -m "chore: publish ${TAG} manifest"
+          git push origin HEAD:main

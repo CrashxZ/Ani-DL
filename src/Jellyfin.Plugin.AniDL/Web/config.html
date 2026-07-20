@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>AniDL settings</title></head>
+<body>
+<div id="AniDLConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-controller="__plugin/AniDLConfigJS" data-require="emby-input,emby-button,emby-checkbox">
+<div data-role="content"><div class="content-primary"><form id="AniDLConfigForm">
+  <h2>AniDL</h2>
+  <div class="inputContainer"><label class="inputLabel" for="ad-library-root">Anime library root</label><input is="emby-input" id="ad-library-root" required><div class="fieldDescription">Absolute path visible to the Jellyfin server. All output is contained beneath this directory.</div></div>
+  <div class="inputContainer"><label class="inputLabel" for="ad-users">Authorized non-admin users</label><input is="emby-input" id="ad-users"><div class="fieldDescription">Comma-separated Jellyfin usernames or user IDs.</div></div>
+  <div class="checkboxContainer"><label class="emby-checkbox-label"><input is="emby-checkbox" type="checkbox" id="ad-nonadmin"><span>Allow listed non-administrator users</span></label></div>
+  <div class="inputContainer"><label class="inputLabel" for="ad-concurrency">Concurrent downloads</label><input is="emby-input" type="number" min="1" max="4" id="ad-concurrency"></div>
+  <div class="inputContainer"><label class="inputLabel" for="ad-retries">Retry attempts</label><input is="emby-input" type="number" min="0" max="5" id="ad-retries"></div>
+  <div class="checkboxContainer"><label class="emby-checkbox-label"><input is="emby-checkbox" type="checkbox" id="ad-refresh-library"><span>Refresh library after completion</span></label></div>
+  <button is="emby-button" type="submit" class="raised button-submit block"><span>Save</span></button>
+</form></div></div></div>
+</body></html>
+
