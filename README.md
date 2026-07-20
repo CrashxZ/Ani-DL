@@ -40,7 +40,7 @@ Then open Catalog, install AniDL, and restart Jellyfin.
 ### Manual installation
 
 1. Confirm the server is Jellyfin 10.11.6 and has its normal bundled/configured ffmpeg.
-2. Extract the release ZIP into a new plugin directory such as `plugins/AniDL_0.1.0.2/`.
+2. Extract the release ZIP into a new plugin directory such as `plugins/AniDL_0.1.0.3/`.
 3. Restart Jellyfin.
 4. In Dashboard → Plugins → AniDL, set an absolute anime library root that the Jellyfin service account can write.
 5. Optionally enable non-admin access and list exact Jellyfin usernames or user IDs.

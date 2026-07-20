@@ -137,9 +137,9 @@ public sealed class AniDLController(SourceRegistry sources, DownloadQueue queue,
     }
 
     public sealed record CreateDownloadRequest(
-        [property: Required] string SourceId,
-        [property: Required] string SeriesUrl,
-        [property: Required] string EpisodeSlug,
+        [param: Required] string SourceId,
+        [param: Required] string SeriesUrl,
+        [param: Required] string EpisodeSlug,
         int SeasonNumber,
         AudioPreference Audio,
         bool IncludeEnglishSubtitles = true);

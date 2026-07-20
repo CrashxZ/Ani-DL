@@ -51,7 +51,7 @@ jobs:
         run: |
           gh release create "$TAG" "artifacts/anidl-${TAG}.zip" \
             --title "AniDL ${TAG#v}" \
-            --notes "Fixes Jellyfin 10.11 JSON field handling and displays actionable HTTP errors in the AniDL UI."
+            --notes "Fixes download request validation compatibility with Jellyfin 10.11 so episodes can be queued."
 
       - name: Update Jellyfin repository manifest
         env:
