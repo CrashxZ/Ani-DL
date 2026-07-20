@@ -25,8 +25,8 @@ jobs:
       - name: Publish plugin
         run: dotnet publish src/Jellyfin.Plugin.AniDL/Jellyfin.Plugin.AniDL.csproj -c Release --no-build -o artifacts/AniDL
       - name: Package plugin
-        run: cd artifacts && zip -r AniDL-0.1.0.zip AniDL
+        run: cd artifacts && zip -r AniDL-0.1.0.1.zip AniDL
       - uses: actions/upload-artifact@v4
         with:
-          name: AniDL-0.1.0
-          path: artifacts/AniDL-0.1.0.zip
+          name: AniDL-0.1.0.1
+          path: artifacts/AniDL-0.1.0.1.zip

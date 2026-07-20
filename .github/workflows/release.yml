@@ -67,10 +67,13 @@ jobs:
           with open(path, encoding="utf-8") as stream:
               manifest = json.load(stream)
 
+          with open("src/Jellyfin.Plugin.AniDL/meta.json", encoding="utf-8") as stream:
+              metadata = json.load(stream)
+
           entry = {
               "version": os.environ["VERSION"],
-              "changelog": "Initial experimental AniSuge adapter, secure download queue, and Jellyfin UI.",
-              "targetAbi": "10.11.11.0",
+              "changelog": metadata["changelog"],
+              "targetAbi": metadata["targetAbi"],
               "sourceUrl": f"https://github.com/{os.environ['REPOSITORY']}/releases/download/{os.environ['TAG']}/anidl-{os.environ['TAG']}.zip",
               "checksum": os.environ["CHECKSUM"],
               "timestamp": datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),

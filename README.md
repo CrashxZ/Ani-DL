@@ -1,6 +1,6 @@
 # AniDL for Jellyfin
 
-AniDL is a Jellyfin 10.11.11 plugin for authorized users to search, browse, queue, and import anime into a configured Jellyfin library. The first source is an **experimental AniSuge adapter**. Japanese audio with English subtitles and English dub are offered as distinct choices when the source advertises them.
+AniDL is a Jellyfin 10.11.6 plugin for authorized users to search, browse, queue, and import anime into a configured Jellyfin library. The first source is an **experimental AniSuge adapter**. Japanese audio with English subtitles and English dub are offered as distinct choices when the source advertises them.
 
 Only download media you are legally entitled to save. AniDL does not bypass DRM, logins, CAPTCHAs, paywalls, or other access controls. A provider that does not expose a direct public HLS, DASH, or MP4 resource fails closed.
 
@@ -15,7 +15,7 @@ Only download media you are legally entitled to save. AniDL does not bypass DRM,
 
 ## Build without installing anything locally
 
-This repository's GitHub Actions workflow restores, builds, tests, publishes, and produces `AniDL-0.1.0.zip` using an ephemeral .NET 9 runner. No .NET SDK, ffmpeg, Node.js, or browser automation is required on the development machine.
+This repository's GitHub Actions workflow restores, builds, tests, publishes, and produces a versioned AniDL ZIP using an ephemeral .NET 9 runner. No .NET SDK, ffmpeg, Node.js, or browser automation is required on the development machine.
 
 To build elsewhere:
 
@@ -39,8 +39,8 @@ Then open Catalog, install AniDL, and restart Jellyfin.
 
 ### Manual installation
 
-1. Confirm the server is Jellyfin 10.11.11 and has its normal bundled/configured ffmpeg.
-2. Extract the release ZIP into a new plugin directory such as `plugins/AniDL_0.1.0.0/`.
+1. Confirm the server is Jellyfin 10.11.6 and has its normal bundled/configured ffmpeg.
+2. Extract the release ZIP into a new plugin directory such as `plugins/AniDL_0.1.0.1/`.
 3. Restart Jellyfin.
 4. In Dashboard → Plugins → AniDL, set an absolute anime library root that the Jellyfin service account can write.
 5. Optionally enable non-admin access and list exact Jellyfin usernames or user IDs.
