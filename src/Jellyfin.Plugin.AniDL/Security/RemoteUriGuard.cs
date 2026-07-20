@@ -40,13 +40,13 @@ public static class RemoteUriGuard
                 return IsNonPublic(address.MapToIPv4());
             }
 
-            var bytes = address.GetAddressBytes();
+            var ipv6Bytes = address.GetAddressBytes();
             return address.Equals(IPAddress.IPv6Any)
                 || address.Equals(IPAddress.IPv6None)
                 || address.IsIPv6LinkLocal
                 || address.IsIPv6Multicast
-                || (bytes[0] & 0xfe) == 0xfc
-                || (bytes[0] == 0x20 && bytes[1] == 0x01 && bytes[2] == 0x0d && bytes[3] == 0xb8);
+                || (ipv6Bytes[0] & 0xfe) == 0xfc
+                || (ipv6Bytes[0] == 0x20 && ipv6Bytes[1] == 0x01 && ipv6Bytes[2] == 0x0d && ipv6Bytes[3] == 0xb8);
         }
 
         var bytes = address.GetAddressBytes();

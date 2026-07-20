@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Jellyfin.Plugin.AniDL.Downloads;
 
-public sealed class FfmpegRunner(IMediaEncoder mediaEncoder, ILogger<FfmpegRunner> logger)
+public sealed partial class FfmpegRunner(IMediaEncoder mediaEncoder, ILogger<FfmpegRunner> logger)
 {
     public async Task RunAsync(MediaResource resource, string destinationPath, Action<double> progress, CancellationToken cancellationToken)
     {
@@ -100,7 +100,7 @@ public sealed class FfmpegRunner(IMediaEncoder mediaEncoder, ILogger<FfmpegRunne
             throw;
         }
 
-        logger.LogInformation("Completed AniDL media import at {DestinationPath}", destinationPath);
+        LogCompleted(logger, destinationPath);
     }
 
     private static string ValidateHeader(string value)
@@ -125,4 +125,7 @@ public sealed class FfmpegRunner(IMediaEncoder mediaEncoder, ILogger<FfmpegRunne
         {
         }
     }
+
+    [LoggerMessage(EventId = 3001, Level = LogLevel.Information, Message = "Completed AniDL media import at {DestinationPath}")]
+    private static partial void LogCompleted(ILogger logger, string destinationPath);
 }

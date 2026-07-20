@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace Jellyfin.Plugin.AniDL.Downloads;
 
-public sealed class DownloadStore
+public sealed class DownloadStore : IDisposable
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { WriteIndented = true };
     private readonly SemaphoreSlim _gate = new(1, 1);
@@ -58,5 +58,6 @@ public sealed class DownloadStore
             _gate.Release();
         }
     }
-}
 
+    public void Dispose() => _gate.Dispose();
+}

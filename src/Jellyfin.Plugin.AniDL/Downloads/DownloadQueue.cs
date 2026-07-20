@@ -9,7 +9,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.AniDL.Downloads;
 
-public sealed class DownloadQueue(
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "This hosted service is the bounded download queue exposed by the plugin API.")]
+public sealed partial class DownloadQueue(
     DownloadStore store,
     SourceRegistry sources,
     FfmpegRunner ffmpeg,
@@ -171,7 +172,7 @@ public sealed class DownloadQueue(
                 Touch(job);
                 await PersistWithoutCancellationAsync().ConfigureAwait(false);
                 var delay = TimeSpan.FromSeconds(Math.Min(30, Math.Pow(2, attempt)));
-                logger.LogWarning(exception, "AniDL job {JobId} failed on attempt {Attempt}; retrying in {Delay}", job.Id, attempt, delay);
+                LogRetry(logger, exception, job.Id, attempt, delay);
                 try
                 {
                     await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
@@ -197,7 +198,7 @@ public sealed class DownloadQueue(
                 job.State = DownloadState.Failed;
                 job.Error = exception.Message;
                 Touch(job);
-                logger.LogError(exception, "AniDL job {JobId} failed", job.Id);
+                LogFailure(logger, exception, job.Id);
                 await PersistWithoutCancellationAsync().ConfigureAwait(false);
                 return;
             }
@@ -222,4 +223,10 @@ public sealed class DownloadQueue(
     private static bool IsSameEpisode(QueueDownloadRequest left, QueueDownloadRequest right) => left.SourceId.Equals(right.SourceId, StringComparison.OrdinalIgnoreCase) && left.SeriesUrl.Equals(right.SeriesUrl, StringComparison.OrdinalIgnoreCase) && left.EpisodeSlug.Equals(right.EpisodeSlug, StringComparison.OrdinalIgnoreCase) && left.Audio == right.Audio;
 
     private static void Touch(DownloadJob job) => job.UpdatedAt = DateTimeOffset.UtcNow;
+
+    [LoggerMessage(EventId = 2001, Level = LogLevel.Warning, Message = "AniDL job {JobId} failed on attempt {Attempt}; retrying in {Delay}")]
+    private static partial void LogRetry(ILogger logger, Exception exception, Guid jobId, int attempt, TimeSpan delay);
+
+    [LoggerMessage(EventId = 2002, Level = LogLevel.Error, Message = "AniDL job {JobId} failed")]
+    private static partial void LogFailure(ILogger logger, Exception exception, Guid jobId);
 }

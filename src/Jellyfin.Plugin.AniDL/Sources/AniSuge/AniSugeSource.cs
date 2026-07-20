@@ -69,7 +69,7 @@ public sealed partial class AniSugeSource(IHttpClientFactory httpClientFactory, 
         var document = await _parser.ParseDocumentAsync(page, cancellationToken).ConfigureAwait(false);
         var root = document.QuerySelector(".watch-wrap") ?? throw new InvalidDataException("AniSuge watch-page marker was not found.");
         var animeId = root.GetAttribute("data-id") ?? throw new InvalidDataException("AniSuge anime id was not found.");
-        var baseUrl = root.GetAttribute("data-url") ?? seriesUrl.Split("/ep-", StringSplitOptions.Ordinal)[0];
+        var baseUrl = root.GetAttribute("data-url") ?? seriesUrl.Split("/ep-", StringSplitOptions.None)[0];
         var response = await GetAjaxAsync($"ajax/episode/list/{Uri.EscapeDataString(animeId)}?vrf={Uri.EscapeDataString(AniSugeVrf.Create(animeId))}", uri, cancellationToken).ConfigureAwait(false);
         var episodesDocument = await _parser.ParseDocumentAsync(response, cancellationToken).ConfigureAwait(false);
 
@@ -105,7 +105,7 @@ public sealed partial class AniSugeSource(IHttpClientFactory httpClientFactory, 
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
-            logger.LogDebug(exception, "AniSuge mapper alternatives were unavailable");
+            LogMapperUnavailable(logger, exception);
         }
 
         linkIds.AddRange(servers.Select(server => server.GetAttribute("data-link-id")).OfType<string>().Where(value => !string.IsNullOrWhiteSpace(value)));
@@ -139,7 +139,7 @@ public sealed partial class AniSugeSource(IHttpClientFactory httpClientFactory, 
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
                 lastError = exception;
-                logger.LogDebug(exception, "An AniSuge provider could not expose a direct media resource");
+                LogProviderUnavailable(logger, exception);
             }
         }
 
@@ -223,7 +223,7 @@ public sealed partial class AniSugeSource(IHttpClientFactory httpClientFactory, 
             }
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
-                logger.LogTrace(exception, "Nested provider resource was not directly downloadable");
+                LogNestedResourceUnavailable(logger, exception);
             }
         }
 
@@ -400,4 +400,13 @@ public sealed partial class AniSugeSource(IHttpClientFactory httpClientFactory, 
 
     [GeneratedRegex("(?<url>https?://[^\\\"'<> ]+?\\.(?:m3u8|mpd|mp4)(?:\\?[^\\\"'<> ]*)?)", RegexOptions.IgnoreCase)]
     private static partial Regex MediaUrlRegex();
+
+    [LoggerMessage(EventId = 1001, Level = LogLevel.Debug, Message = "AniSuge mapper alternatives were unavailable")]
+    private static partial void LogMapperUnavailable(ILogger logger, Exception exception);
+
+    [LoggerMessage(EventId = 1002, Level = LogLevel.Debug, Message = "An AniSuge provider could not expose a direct media resource")]
+    private static partial void LogProviderUnavailable(ILogger logger, Exception exception);
+
+    [LoggerMessage(EventId = 1003, Level = LogLevel.Trace, Message = "Nested provider resource was not directly downloadable")]
+    private static partial void LogNestedResourceUnavailable(ILogger logger, Exception exception);
 }
