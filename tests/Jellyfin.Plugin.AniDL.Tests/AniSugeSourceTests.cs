@@ -47,7 +47,7 @@ public sealed class AniSugeSourceTests
         var episode = Assert.Single(episodes);
         Assert.True(episode.HasJapaneseWithEnglishSubtitles);
         Assert.True(episode.HasEnglishDub);
-        var ajaxRequest = Assert.Single(requests.Where(request => request.RequestUri!.AbsolutePath.StartsWith("/ajax/", StringComparison.Ordinal)));
+        var ajaxRequest = Assert.Single(requests, request => request.RequestUri!.AbsolutePath.StartsWith("/ajax/", StringComparison.Ordinal));
         Assert.Contains("vrf=GH1ICj%3D%3D", ajaxRequest.RequestUri!.Query, StringComparison.Ordinal);
         Assert.True(ajaxRequest.Headers.Contains("X-Requested-With"));
     }
