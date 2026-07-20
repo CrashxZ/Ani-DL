@@ -370,7 +370,7 @@ public sealed partial class AniSugeSource(IHttpClientFactory httpClientFactory, 
         return uri;
     }
 
-    private Uri ValidateSeriesUri(string value)
+    private static Uri ValidateSeriesUri(string value)
     {
         var uri = new Uri(value);
         var expected = GetBaseUri();
