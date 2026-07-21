@@ -4,7 +4,7 @@
 <body>
 <div id="AniDLPage" data-role="page" class="page type-interior" data-controller="__plugin/AniDLJS">
   <style>
-    .ad{max-width:1100px;margin:auto;padding:1.2em}.ad-row{display:flex;gap:.7em;align-items:center;flex-wrap:wrap}.ad-search{flex:1;min-width:14em}.ad-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1em;margin-top:1em}.ad-card,.ad-job{padding:1em;border-radius:.6em;background:rgba(255,255,255,.06)}.ad-card{cursor:pointer}.ad-card:hover{background:rgba(255,255,255,.1)}.ad-card h3{margin:.2em 0}.ad-muted{opacity:.7}.ad-section{margin-top:1.5em}.ad-episodes{display:grid;gap:.5em}.ad-episode,.ad-job{display:flex;justify-content:space-between;gap:1em;align-items:center}.ad-error{color:#ff8a80;white-space:pre-wrap}.ad-tabs button.active{background:#00a4dc;color:white}.ad-status{font-size:.8em;text-transform:uppercase;opacity:.8}.ad-progress{height:5px;background:rgba(255,255,255,.15);margin-top:.4em}.ad-progress i{display:block;height:100%;background:#00a4dc}.ad-note{padding:.8em;border-left:3px solid #f0ad4e;background:rgba(240,173,78,.1)}
+    .ad{max-width:1100px;margin:auto;padding:1.2em}.ad-row{display:flex;gap:.7em;align-items:center;flex-wrap:wrap}.ad-search{flex:1;min-width:14em}.ad-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1em;margin-top:1em}.ad-card,.ad-job{padding:1em;border-radius:.6em;background:rgba(255,255,255,.06)}.ad-card{cursor:pointer;overflow:hidden}.ad-card:hover{background:rgba(255,255,255,.1)}.ad-card h3{margin:.5em 0 .2em}.ad-poster{display:block;width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:.45em;background:rgba(255,255,255,.08)}.ad-details-header{display:grid;grid-template-columns:minmax(130px,220px) 1fr;gap:1.25em;align-items:start}.ad-details-header h2{margin-top:0}.ad-muted{opacity:.7}.ad-section{margin-top:1.5em}.ad-episodes{display:grid;gap:.5em;margin-top:1em}.ad-episode,.ad-job{display:flex;justify-content:space-between;gap:1em;align-items:center}.ad-error{color:#ff8a80;white-space:pre-wrap}.ad-tabs button.active{background:#00a4dc;color:white}.ad-status{font-size:.8em;text-transform:uppercase;opacity:.8}.ad-progress{height:5px;background:rgba(255,255,255,.15);margin-top:.4em}.ad-progress i{display:block;height:100%;background:#00a4dc}.ad-note{padding:.8em;border-left:3px solid #f0ad4e;background:rgba(240,173,78,.1)}@media(max-width:600px){.ad-details-header{grid-template-columns:100px 1fr}.ad-card{padding:.75em}}
   </style>
   <div data-role="content"><div class="content-primary ad">
     <h2>Anime Downloader</h2>
@@ -25,10 +25,10 @@
     </section>
     <section data-panel="downloads" class="ad-section" hidden>
       <div class="ad-row"><h3 style="flex:1">Download queue</h3><button is="emby-button" class="raised" id="ad-refresh">Refresh</button></div>
+      <div id="ad-jobs-error" class="ad-error"></div>
       <div id="ad-jobs"></div>
     </section>
   </div></div>
 </div>
 </body>
 </html>
-

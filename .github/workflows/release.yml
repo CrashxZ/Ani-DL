@@ -51,7 +51,7 @@ jobs:
         run: |
           gh release create "$TAG" "artifacts/anidl-${TAG}.zip" \
             --title "AniDL ${TAG#v}" \
-            --notes "Fixes download request validation compatibility with Jellyfin 10.11 so episodes can be queued."
+            --notes "Adds automatic queue refresh and secure lazy-loaded anime artwork to the AniDL UI."
 
       - name: Update Jellyfin repository manifest
         env:

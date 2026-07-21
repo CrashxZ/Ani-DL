@@ -1,6 +1,6 @@
 export default function (view) {
     const $ = (selector) => view.querySelector(selector);
-    const state = { details: null, episodes: [] };
+    const state = { details: null, episodes: [], jobsLoading: false, jobPollId: null };
 
     function api(path, options) {
         const settings = options || {};
@@ -21,6 +21,18 @@ export default function (view) {
     }
     function text(tag, value, className) { const node = document.createElement(tag); node.textContent = value == null ? '' : value; if (className) node.className = className; return node; }
     function button(label, action) { const node = text('button', label, 'raised'); node.setAttribute('is', 'emby-button'); node.type = 'button'; node.addEventListener('click', action); return node; }
+    function poster(url, title) {
+        if (!url) return null;
+        let parsed;
+        try { parsed = new URL(url); } catch (_) { return null; }
+        if (parsed.protocol !== 'https:') return null;
+
+        const node = document.createElement('img');
+        node.className = 'ad-poster'; node.src = parsed.href; node.alt = title ? title + ' poster' : 'Anime poster';
+        node.loading = 'lazy'; node.decoding = 'async'; node.referrerPolicy = 'no-referrer';
+        node.addEventListener('error', () => { node.hidden = true; }, { once: true });
+        return node;
+    }
     async function errorMessage(error) {
         if (!error) return 'The request failed.';
         if (typeof error.responseText === 'string' && error.responseText.trim()) return error.responseText;
@@ -41,7 +53,9 @@ export default function (view) {
         const host = $('#ad-results'); clear(host); clear($('#ad-details'));
         cards.forEach(card => {
             const node = document.createElement('article'); node.className = 'ad-card';
-            node.append(text('h3', field(card, 'Title')));
+            const title = field(card, 'Title');
+            const art = poster(field(card, 'PosterUrl'), title); if (art) node.append(art);
+            node.append(text('h3', title));
             node.append(text('div', (field(card, 'MediaType') || 'Anime') + ' · ' + field(card, 'SubtitledEpisodes') + ' sub · ' + field(card, 'DubbedEpisodes') + ' dub', 'ad-muted'));
             node.addEventListener('click', () => loadDetails(field(card, 'Url'))); host.append(node);
         });
@@ -60,8 +74,12 @@ export default function (view) {
 
     function renderDetails() {
         const host = $('#ad-details'); clear(host);
-        host.append(text('h2', field(state.details, 'Title')));
-        if (field(state.details, 'Description')) host.append(text('p', field(state.details, 'Description'), 'ad-muted'));
+        const header = document.createElement('div'); header.className = 'ad-details-header';
+        const title = field(state.details, 'Title');
+        const art = poster(field(state.details, 'PosterUrl'), title); if (art) header.append(art);
+        const copy = document.createElement('div'); copy.append(text('h2', title));
+        if (field(state.details, 'Description')) copy.append(text('p', field(state.details, 'Description'), 'ad-muted'));
+        header.append(copy); host.append(header);
         const list = document.createElement('div'); list.className = 'ad-episodes';
         state.episodes.forEach(episode => {
             const row = document.createElement('div'); row.className = 'ad-episode ad-card';
@@ -78,13 +96,16 @@ export default function (view) {
         Dashboard.showLoadingMsg();
         try {
             await api('Downloads', { method: 'POST', body: { sourceId: 'anisuge', seriesUrl: field(state.details, 'Url'), episodeSlug: field(episode, 'Slug'), seasonNumber: 1, audio: audio, includeEnglishSubtitles: subtitles } });
-            Dashboard.hideLoadingMsg(); Dashboard.alert('Download queued.'); showTab('downloads'); loadJobs();
+            Dashboard.hideLoadingMsg(); Dashboard.alert('Download queued.'); showTab('downloads');
         } catch (error) { await fail(error); }
     }
 
     async function loadJobs() {
+        if (state.jobsLoading) return;
+        state.jobsLoading = true;
         try {
             const jobs = await api('Downloads'); const host = $('#ad-jobs'); clear(host);
+            $('#ad-jobs-error').textContent = '';
             jobs.forEach(job => {
                 const node = document.createElement('div'); node.className = 'ad-job';
                 const info = document.createElement('div'); info.style.flex = '1';
@@ -94,11 +115,18 @@ export default function (view) {
                 info.append(text('strong', field(request, 'SeriesTitle') + ' · E' + field(request, 'EpisodeNumber')));
                 info.append(text('div', stateName + (error ? ' · ' + error : ''), error ? 'ad-error' : 'ad-status'));
                 const progress = document.createElement('div'); progress.className = 'ad-progress'; const bar = document.createElement('i'); bar.style.width = Math.max(0, Math.min(100, field(job, 'ProgressPercent'))) + '%'; progress.append(bar); info.append(progress); node.append(info);
-                if (['Queued', 'Resolving', 'Downloading'].includes(stateName)) node.append(button('Cancel', async () => { await api('Downloads/' + field(job, 'Id'), { method: 'DELETE' }); loadJobs(); }));
+                if (['Queued', 'Resolving', 'Downloading'].includes(stateName)) node.append(button('Cancel', async () => {
+                    try { await api('Downloads/' + field(job, 'Id'), { method: 'DELETE' }); await loadJobs(); }
+                    catch (error) { $('#ad-jobs-error').textContent = await errorMessage(error); }
+                }));
                 host.append(node);
             });
             if (!jobs.length) host.append(text('p', 'No downloads yet.', 'ad-muted'));
-        } catch (error) { await fail(error); }
+        } catch (error) {
+            $('#ad-jobs-error').textContent = await errorMessage(error);
+        } finally {
+            state.jobsLoading = false;
+        }
     }
 
     async function loadCatalog(path, query) {
@@ -109,11 +137,23 @@ export default function (view) {
     function showTab(name) {
         view.querySelectorAll('[data-panel]').forEach(node => node.hidden = node.dataset.panel !== name);
         view.querySelectorAll('[data-tab]').forEach(node => node.classList.toggle('active', node.dataset.tab === name));
+        if (name === 'downloads') startJobPolling(); else stopJobPolling();
+    }
+
+    function stopJobPolling() {
+        if (state.jobPollId !== null) window.clearInterval(state.jobPollId);
+        state.jobPollId = null;
+    }
+
+    function startJobPolling() {
+        stopJobPolling(); loadJobs();
+        state.jobPollId = window.setInterval(loadJobs, 2500);
     }
 
     $('#ad-search-form').addEventListener('submit', event => { event.preventDefault(); loadCatalog('Search', { query: $('#ad-query').value, source: 'anisuge' }); });
     $('#ad-updated').addEventListener('click', () => loadCatalog('Browse', { category: 'updated', source: 'anisuge' }));
     $('#ad-refresh').addEventListener('click', loadJobs);
-    view.querySelectorAll('[data-tab]').forEach(node => node.addEventListener('click', () => { showTab(node.dataset.tab); if (node.dataset.tab === 'downloads') loadJobs(); }));
+    view.querySelectorAll('[data-tab]').forEach(node => node.addEventListener('click', () => showTab(node.dataset.tab)));
     view.addEventListener('viewshow', () => loadCatalog('Browse', { category: 'updated', source: 'anisuge' }));
+    view.addEventListener('viewhide', stopJobPolling);
 }
